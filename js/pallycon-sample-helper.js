@@ -1,9 +1,16 @@
 var browser = 'Non-DRM browser';
 var drmType = 'No DRM';
 
-// Replace the DASH and HLS URIs when you test your own content. 
-var dashUri = 'https://contents.pallycon.com/bunny/stream.mpd';
-var hlsUri = 'https://contents.pallycon.com/bunny/hls/master.m3u8';
+
+function configureUris() {
+    const uuid = 'f959101a-cf6d-4b06-bbd1-bb6840743726';
+
+
+
+}
+
+var dashUri = 'https://dev-flx-drm-content.s3.amazonaws.com/9d43a5784353f9290106d285b8d3631084590d25_dash.mpd?AWSAccessKeyId=AKIAZIL5AZKVBK7EMLU4&Expires=1639685603&Signature=03q5oH8SiJYYAao6maqottdDj2Y%3D';
+
 
 var licenseUri = 'https://license-global.pallycon.com/ri/licenseManager.do';
 
@@ -12,9 +19,9 @@ var fairplayCertUri = 'https://license-global.pallycon.com/ri/fpsKeyManager.do?s
 var fairplayCertDerUri = 'https://license-global.pallycon.com/ri/fpsCert.do?siteId=DEMO'; // for cert .der file download 
 
 // Create and set the license tokens when you test your own content.
-var widevineToken = 'eyJrZXlfcm90YXRpb24iOmZhbHNlLCJyZXNwb25zZV9mb3JtYXQiOiJvcmlnaW5hbCIsInVzZXJfaWQiOiJ0ZXN0LXVzZXIiLCJkcm1fdHlwZSI6IldpZGV2aW5lIiwic2l0ZV9pZCI6IkRFTU8iLCJoYXNoIjoiRFNEQ0JwWmhJYVR5VG1MMzlCXC9Yb2IyNzRobWpWXC9oWEp4T1V0K29hZ1pjPSIsImNpZCI6ImJpZ2J1Y2tidW5ueSIsInBvbGljeSI6Im41eDI4dVltRGRQQ0ZpbW9NM25HTnc9PSIsInRpbWVzdGFtcCI6IjIwMjEtMDEtMDZUMDk6MjI6MzZaIn0=';
-var playreadyToken = 'eyJrZXlfcm90YXRpb24iOmZhbHNlLCJyZXNwb25zZV9mb3JtYXQiOiJvcmlnaW5hbCIsInVzZXJfaWQiOiJ0ZXN0LXVzZXIiLCJkcm1fdHlwZSI6IlBsYXlSZWFkeSIsInNpdGVfaWQiOiJERU1PIiwiaGFzaCI6IllDRjViUE9UVHFjZWZDUnlBQks3Rnl0V21mNUJ0T3RhcGo4dVI0QXc2S1E9IiwiY2lkIjoiYmlnYnVja2J1bm55IiwicG9saWN5IjoibjV4Mjh1WW1EZFBDRmltb00zbkdOdz09IiwidGltZXN0YW1wIjoiMjAyMS0wMS0wNlQwOToyNDowN1oifQ==';
-var fairplayToken = 'eyJrZXlfcm90YXRpb24iOmZhbHNlLCJyZXNwb25zZV9mb3JtYXQiOiJvcmlnaW5hbCIsInVzZXJfaWQiOiJ0ZXN0LXVzZXIiLCJkcm1fdHlwZSI6IkZhaXJQbGF5Iiwic2l0ZV9pZCI6IkRFTU8iLCJoYXNoIjoiY21NZkZPUExrakErbTVLZ3BKS09vVnVmRTVTc3hKdVlTUm1jUWM1dmlVUT0iLCJjaWQiOiJiaWdidWNrYnVubnkiLCJwb2xpY3kiOiJuNXgyOHVZbURkUENGaW1vTTNuR053PT0iLCJ0aW1lc3RhbXAiOiIyMDIxLTAxLTA2VDA5OjI0OjI4WiJ9';
+var widevineToken = '';
+var playreadyToken = widevineToken;
+var fairplayToken = widevineToken;
 
 // Detect the browser and set proper DRM type
 function checkBrowser() {
@@ -212,109 +219,3 @@ function checkSupportedDRM() {
   supportedDRM = "FairPlay";
 }
 
-/* Commenting out the below code since it doesn't work well on Safari
-
-// EME Check
-var keySystems = {
-  widevine: ['com.widevine.alpha'],
-  playready: ['com.microsoft.playready'],
-  fairplay: ['com.apple.fairplay', 'com.apple.fps.1_0', 'com.apple.fps.2_0']
-};
-
-var keySystemsCount = (function () {
-  var count = 0;
-  for (keysys in keySystems) {
-    if (keySystems.hasOwnProperty(keysys)) {
-      count += keySystems[keysys].length;
-    }
-  }
-  return count;
-})();
-
-var testVideoElement = document.createElement('video');
-var supportedSystems = [];
-var unsupportedSystems = [];
-
-var supportsEncryptedMediaExtension = function () {
-  if (!testVideoElement.mediaKeys) {
-    if (window.navigator.requestMediaKeySystemAccess) {
-      if (typeof window.navigator.requestMediaKeySystemAccess === 'function') {
-        console.log('found default EME');
-        hasEME = true;
-
-        var isKeySystemSupported = function (keySystem) {
-          var config = [{
-            "initDataTypes": ["cenc"],
-            "audioCapabilities": [{
-              "contentType": "audio/mp4;codecs=\"mp4a.40.2\""
-            }],
-            "videoCapabilities": [{
-              "contentType": "video/mp4;codecs=\"avc1.42E01E\""
-            }]
-          }];
-
-          if (window.navigator.requestMediaKeySystemAccess) {
-            window.navigator.requestMediaKeySystemAccess(keySystem, config).then(function (keySystemAccess) {
-              supportedSystems.push(keySystem);
-              supportedDRM = keySystem;
-              console.log(`supported drm: ${keySystem}`);
-            }).catch(function () {
-              unsupportedSystems.push(keySystem);
-            });
-          }
-        };
-
-        var keysys, dummy, i;
-        for (keysys in keySystems) {
-          if (keySystems.hasOwnProperty(keysys)) {
-            for (dummy in keySystems[keysys]) {
-              isKeySystemSupported(keySystems[keysys][dummy]);
-            }
-          }
-        }
-      }
-    } else if (window.MSMediaKeys) {
-      if (typeof window.MSMediaKeys === 'function') {
-        console.log('found MS-EME');
-        hasEME = true;
-        var keysys, dummy, i;
-        for (keysys in keySystems) {
-          if (keySystems.hasOwnProperty(keysys)) {
-            for (dummy in keySystems[keysys]) {
-              if (MSMediaKeys.isTypeSupported(keySystems[keysys][dummy])) {
-                supportedSystems.push(keySystems[keysys][dummy]);
-                console.log('playready support ok');
-                supportedDRM = "PlayReady";
-              } else {
-                unsupportedSystems.push(keySystems[keysys][dummy]);
-              }
-            }
-          }
-        }
-      }
-    } else if (testVideoElement.webkitGenerateKeyRequest) {
-      if (typeof testVideoElement.webkitGenerateKeyRequest === 'function') {
-        console.log('found WebKit EME');
-        hasEME = true;
-        var keysys, dummy, i;
-        for (keysys in keySystems) {
-          if (keySystems.hasOwnProperty(keysys)) {
-            for (dummy in keySystems[keysys]) {
-              if (testVideoElement.canPlayType('video/mp4', keySystems[keysys][dummy])) {
-                supportedSystems.push(keySystems[keysys][dummy]);
-                console.log('fairplay support ok');
-                supportedDRM = "FairPlay";
-              } else {
-                unsupportedSystems.push(keySystems[keysys][dummy]);
-              }
-            }
-          }
-        }
-      }
-    } else {
-      console.log('no supported EME implementation found');
-      hasEME = false;
-    }
-  }
-}
-*/

@@ -76,6 +76,7 @@ function configureDRM() {
                 type: 'application/dash+xml'
             };
 
+            console.log('Token is ', widevineToken);
             playerConfig.keySystemOptions = [];
             playerConfig.keySystemOptions.push({
                 name: 'com.widevine.alpha',
@@ -97,9 +98,14 @@ function configureDRM() {
     });
 }
 
-checkBrowser();
-player.ready(function(){
-    configureDRM();
-});
 
-player.play();
+function play () {
+    window.widevineToken = document.getElementById('token').value;
+    checkBrowser();
+    player.ready(function(){
+        configureDRM();
+    });
+
+    player.play();
+
+}
